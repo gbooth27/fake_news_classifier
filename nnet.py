@@ -71,7 +71,7 @@ def run_nnet(data):
 if __name__ == "__main__":
     model = run_nnet(parse_data.parse("kaggle_data.csv"))
 
-    x, y = gen_training_data(parse_data.parse("kaggle_data.csv")[10000:])
+    x, y = gen_training_data(parse_data.parse("kaggle_data.csv"))
     print("Evaluating model...")
     evaluation = model.evaluate(x=x, y=y, verbose=1, batch_size=300)
     print("accuracy: " +str(evaluation))
