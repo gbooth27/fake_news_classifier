@@ -24,9 +24,9 @@ def parse(filename):
         data = []
         for row in reader:
             if reader.line_num>1:
-                title_data = row[1]
+                title_data = row[1].split(" ")
                 author_data = row[2]
-                text_data = row[3]
+                text_data = row[3].split(" ")
                 label = row[4]
                 # Parse the data from the title
                 for title in title_data:
@@ -38,7 +38,7 @@ def parse(filename):
                         if word in FN_figures:
                             Fig_det += 1
                     # change to fraction of title that are key words
-                    Fig_det /= len(title)
+                    Fig_det /= len(title)+1
 
 
                 len_text = len(text_data)+1
