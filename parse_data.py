@@ -45,11 +45,11 @@ def parse(filename):
                     for item in FN_figures.keys():
                         title_dict[item] = FN_figures[item]
                         text_dict[item] = FN_figures[item]
-
+                    title_len = len(title) + 1
                     for word in title:
                         if word in FN_figures:
                             Fig_det += 1
-                            title_dict[word]+= 1
+                            title_dict[word]+= 1 /title_len
                     # change to fraction of title that are key words
                     Fig_det /= len(title)+1
 
@@ -60,7 +60,7 @@ def parse(filename):
                     #Find Language set
                     if word in FN_figures:
                         Fig_text +=1
-                        text_dict[word]+=1
+                        text_dict[word]+= 1/len_text
                 Fig_text /= len_text
 
                 # set up example
