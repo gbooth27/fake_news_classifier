@@ -16,8 +16,8 @@ def parse(filename):
     #Grammar
 
     # Set containing key words
-    FN_figures = {"Russia", "Russian", "WikiLeaks", "Comey", "Donald Trump", "Melania Trump", "Jared Kushner",
-                      "Putin", "North Korea", "Clinton", "Hicks", "Flynn", " Pope Francis", "NRA"}
+    FN_figures = {"Russia", "Russian", "WikiLeaks", "Comey", "Donald", "Trump", "Melania", "Jared", "Kushner",
+                      "Putin", "North", "Korea", "Clinton", "Hicks", "Flynn", " Pope", "Francis", "NRA"}
 
     with open(filename, newline='') as infile:
         reader = csv.reader(infile, delimiter=',')
