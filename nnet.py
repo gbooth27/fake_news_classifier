@@ -62,10 +62,11 @@ def run_nnet(data):
     model.add(Dropout(0.1, noise_shape=None, seed=None))
     model.add(Dense(1000, kernel_initializer='random_uniform', activation='relu'))
     model.add(Dense(200, kernel_initializer='random_uniform', activation='relu'))
+    model.add(Dense(1000, kernel_initializer='random_uniform', activation='relu'))
     model.add(Dropout(0.1, noise_shape=None, seed=None))
     model.add(Dense(1, kernel_initializer='random_uniform', activation="tanh"))
     sgd = optimizers.Adam()
-    model.compile(loss='binary_crossentropy', optimizer=sgd, metrics=["mse"])
+    model.compile(loss='binary_crossentropy', optimizer=sgd)#, metrics=["mse"])
 
     model.fit(x, y, epochs=50, batch_size=512, verbose=2, validation_split=0.2)
 
