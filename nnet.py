@@ -21,20 +21,24 @@ def gen_training_data(data):
 
     examples = 10000
     author_dict = {}
-    author = 1
+    """author = 1
     for i in range(examples):
         # map each author to number
         if data[i][0] not in author_dict:
             author_dict[data[i][0]] = author
             author += 1
-
+    """
+    # Number of examples
     m = examples
-    n = 1
+    # Number of features
+    n = len(data[0])-1
     x = np.zeros((m, n))
     y = np.zeros((m, 1))
+    # get the data as numpy vectors
     for i in range(examples):
-        x[i] = author_dict[data[i][0]]
-        y[i] = data[i][1]
+        for j in range(n):
+            x[i][j] = data[i][j]
+        y[i] = data[i][-1]
 
     return x, y
 
@@ -48,11 +52,11 @@ def run_nnet(data):
     x, y = gen_training_data(data)
 
     model = Sequential()
-    dim1 = len(x)
+    #dim1 = len(x)
     dim2 = len(x[0])
     # Add the layers.
     # Tuning
-    model.add(Dense(dim1, input_dim=dim2, kernel_initializer='random_uniform', activation='relu'))
+    model.add(Dense(dim2, input_dim=dim2, kernel_initializer='random_uniform', activation='relu'))
     model.add(Dense(200, kernel_initializer='random_uniform', activation='relu'))
     model.add(Dense(400, kernel_initializer='random_uniform', activation='relu'))
     model.add(Dropout(0.1, noise_shape=None, seed=None))
@@ -61,17 +65,16 @@ def run_nnet(data):
     model.add(Dropout(0.1, noise_shape=None, seed=None))
     model.add(Dense(1, kernel_initializer='random_uniform', activation="tanh"))
     sgd = optimizers.Adam()
-    model.compile(loss='mse', optimizer=sgd)
+    model.compile(loss='binary_crossentropy', optimizer=sgd, metrics=["mse"])
 
-    model.fit(x, y, epochs=2, batch_size=512, verbose=2, validation_split=0.2)
+    model.fit(x, y, epochs=50, batch_size=512, verbose=2, validation_split=0.2)
 
     return model
 
 if __name__ == "__main__":
-    model = run_nnet(parse_data.parse("kaggle_data.csv"))
-    title_data, text_data, author_data = parse_data("kaggle_data.csv")
-
-    x, y = gen_training_data(author_data)
+    data = parse_data.parse("kaggle_data.csv")
+    model = run_nnet(data)
+    x, y = gen_training_data(data)
     print("Evaluating model...")
     evaluation = model.evaluate(x=x, y=y, verbose=1, batch_size=300)
     print("accuracy: " +str(evaluation))

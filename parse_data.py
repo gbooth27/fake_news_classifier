@@ -15,28 +15,43 @@ def parse(filename):
     #list of aggressive language commonly used in fake news
     #Grammar
 
-    FN_figures = ["Russia", "Russian", "WikiLeaks", "Comey", "Donald Trump", "Melania Trump", "Jared Kushner", "Putin", "North Korea", "Clinton", "Hicks", "Flynn", " Pope Francis", "NRA"]
+    # Set containing key words
+    FN_figures = {"Russia", "Russian", "WikiLeaks", "Comey", "Donald Trump", "Melania Trump", "Jared Kushner",
+                      "Putin", "North Korea", "Clinton", "Hicks", "Flynn", " Pope Francis", "NRA"}
 
     with open(filename, newline='') as infile:
         reader = csv.reader(infile, delimiter=',')
+        data = []
         for row in reader:
             if reader.line_num>1:
                 title_data = row[1]
                 author_data = row[2]
                 text_data = row[3]
+                label = row[4]
+                # Parse the data from the title
+                for title in title_data:
+                    Num_Caps = sum(1 for c in title if c.isupper())
+                    Num_excalmation_points = title.count("!")
+                    Num_Question_marks = title.count("?")
+                    Fig_det = 0
+                    for word in title:
+                        if word in FN_figures:
+                            Fig_det += 1
+                    # change to fraction of title that are key words
+                    Fig_det /= len(title)
 
-        for title in title_data:
-            Num_Caps = sum(1 for c in title if c.isupper())
-            Num_excalmation_points = title.count("!")
-            Num_Question_marks = title.count("?")
-            if any(word in title for word in FN_figures):
-                Fig_det = 1
 
-        for text in text_data:
-             #Find Language set
+                len_text = len(text_data)+1
+                Fig_text = 0
+                for word in text_data:
+                    #Find Language set
+                    if word in FN_figures:
+                        Fig_text +=1
+                Fig_text /= len_text
 
 
-    return
+                data.append([Num_Caps, Num_excalmation_points, Num_Question_marks, Fig_det, Fig_text, label])
+    return data
 
 
 if __name__ == "__main__":
