@@ -22,7 +22,8 @@ def parse(filename):
                   "mueller":0, "hillary":0, "obama":0, "guns":0, "our":0, "crooked":0, "coal":0, "steve":0, "bannon":0,
                   "emails":0, "take":0, "breitbart":0, "make":0, "america":0, "great":0, "again":0, "power":0,
                   "jew":0, "jewish":0, "black":0, "inner":0,"white":0, "city":0, "race":0, "war":0, "bad":0, "conspiracy":0,
-                  "media":0, "liberal":0, "benghazi":0}
+                  "media":0, "liberal":0, "benghazi":0, "pig":0, "woman":0, "republic":0, "cia":0, "organization":0,
+                  "bush":0}
     FN_figures = OrderedDict(sorted(FN_figures.items(), key=lambda t: t[0]))
 
     with open(filename, newline='') as infile:
