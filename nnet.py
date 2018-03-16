@@ -12,14 +12,13 @@ from keras import optimizers
 import os
 from keras import backend as K
 
-def gen_training_data(data):
+def gen_training_data(data, examples):
     """
     formats data correctly
     :param data:
     :return:
     """
 
-    examples = 10000
     author_dict = {}
     """author = 1
     for i in range(examples):
@@ -75,7 +74,7 @@ def run_nnet(data):
     :param data: examples
     :return:
     """
-    x, y = gen_training_data(data)
+    x, y = gen_training_data(data, 17000)
 
     model = Sequential()
     #dim1 = len(x)
@@ -98,14 +97,14 @@ def run_nnet(data):
     sgd = optimizers.Adam()
     model.compile(loss='binary_crossentropy', optimizer=sgd)#, metrics=["mse"])
 
-    model.fit(x, y, epochs=80, batch_size=100, verbose=2, validation_split=0.2)
+    model.fit(x, y, epochs=50, batch_size=100, verbose=2, validation_split=0.2)
 
     return model
 
 if __name__ == "__main__":
     data = parse_data.parse("kaggle_data.csv")
     model = run_nnet(data)
-    x, y = gen_training_data(data[10000:])
+    x, y = gen_training_data(data[17000:], len(data[17000:]))
     print("Evaluating model...")
     evaluation = model.evaluate(x=x, y=y, verbose=1, batch_size=300)
     print("Test Loss: " + str(evaluation))
