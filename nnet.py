@@ -74,7 +74,7 @@ def run_nnet(data):
     :param data: examples
     :return:
     """
-    x, y = gen_training_data(data, 17000)
+    x, y = gen_training_data(data, 10000)
 
     model = Sequential()
     #dim1 = len(x)
@@ -104,7 +104,7 @@ def run_nnet(data):
 if __name__ == "__main__":
     data = parse_data.parse("kaggle_data.csv")
     model = run_nnet(data)
-    x, y = gen_training_data(data[17000:], len(data[17000:]))
+    x, y = gen_training_data(data[10000:], len(data[10000:]))
     print("Evaluating model...")
     evaluation = model.evaluate(x=x, y=y, verbose=1, batch_size=300)
     print("Test Loss: " + str(evaluation))
