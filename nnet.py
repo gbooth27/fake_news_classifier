@@ -78,5 +78,24 @@ if __name__ == "__main__":
     x, y = gen_training_data(data[10000:])
     print("Evaluating model...")
     evaluation = model.evaluate(x=x, y=y, verbose=1, batch_size=300)
-    print("accuracy: " +str(evaluation))
+    print("Test Loss: " + str(evaluation))
+    print("\nPredicting against test data....")
+    predict = model.predict(x=x)
+    right = 0
+    wrong = 0
+    # calculate how accurate we are
+    for i in range(len(predict)):
+        if predict[i] < 0.5:
+            curr = 0
+        else:
+            curr = 1
+        # see if right or wrong
+        if curr == y[i]:
+            right+=1
+        else:
+            wrong+=1
+
+    print("Number Correct: {} Number Incorrect: {} Percent error: {}".format(right,wrong, wrong/len(predict)))
+
+
     #print("Loss(mse): {}  metrics MAE: {} err : {}".format(*evaluation))
