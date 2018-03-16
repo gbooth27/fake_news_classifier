@@ -17,9 +17,10 @@ def parse(filename):
     #Grammar
 
     # Set containing key words
-    FN_figures = {"Russia":0, "Russian":0, "WikiLeaks":0, "Comey":0, "Donald":0, "Trump":0, "Melania":0, "Jared":0, "Kushner":0,
-                      "Putin":0, "North":0, "Korea":0, "Clinton":0, "Hicks":0, "Flynn":0, " Pope":0, "Francis":0, "NRA":0, "!":0,
-                  "Mueller":0, "Hillary":0, "Obama":0, "guns":0, "our":0, "crooked":0, "coal":0}
+    FN_figures = {"russia":0, "russian":0, "wikiLeaks":0, "comey":0, "donald":0, "trump":0, "melania":0, "jared":0, "kushner":0,
+                      "putin":0, "north":0, "korea":0, "clinton":0, "hicks":0, "flynn":0, " pope":0, "francis":0, "nra":0, "!":0,
+                  "mueller":0, "hillary":0, "obama":0, "guns":0, "our":0, "crooked":0, "coal":0, "steve":0, "bannon":0,
+                  "emails":0, "take":0, "breitbart":0, "make":0, "america":0, "great":0, "again":0}
     FN_figures = OrderedDict(sorted(FN_figures.items(), key=lambda t: t[0]))
 
     with open(filename, newline='') as infile:
@@ -39,7 +40,7 @@ def parse(filename):
                     Num_Question_marks = title.count("?")
                     Fig_det = 0
 
-                    # get binary representations of words
+                    # get binary representations of words as ordered dict
                     title_dict = OrderedDict()
                     text_dict = OrderedDict()
                     for item in FN_figures.keys():
@@ -47,9 +48,9 @@ def parse(filename):
                         text_dict[item] = FN_figures[item]
                     title_len = len(title) + 1
                     for word in title:
-                        if word in FN_figures:
+                        if word.lower() in FN_figures:
                             Fig_det += 1
-                            title_dict[word]+= 1 /title_len
+                            title_dict[word.lower()]+= 1 /title_len
                     # change to fraction of title that are key words
                     Fig_det /= len(title)+1
 
@@ -58,9 +59,9 @@ def parse(filename):
                 Fig_text = 0
                 for word in text_data:
                     #Find Language set
-                    if word in FN_figures:
+                    if word.lower() in FN_figures:
                         Fig_text +=1
-                        text_dict[word]+= 1/len_text
+                        text_dict[word.lower()]+= 1/len_text
                 Fig_text /= len_text
 
                 # set up example

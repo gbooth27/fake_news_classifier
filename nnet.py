@@ -65,8 +65,7 @@ def predict(model, x, y):
         else:
             wrong += 1
 
-    print(
-        "Number Correct: {} Number Incorrect: {} Percent error: {}".format(right, wrong, 100 * (wrong / len(predict))))
+    print("Number Correct: {}\n Number Incorrect: {}\n Percent error: {}".format(right, wrong, 100*(wrong/len(predict))))
 
 
 def run_nnet(data):
