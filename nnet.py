@@ -7,7 +7,7 @@ import numpy as np
 import argparse
 from keras.models import load_model
 import parse_data
-from matplotlib import pyplot as plt
+#from matplotlib import pyplot as plt
 from keras import optimizers
 import os
 from keras import backend as K
@@ -74,7 +74,7 @@ def run_nnet(data):
     :param data: examples
     :return:
     """
-    x, y = gen_training_data(data, 10000)
+    x, y = gen_training_data(data, 1000)
 
     model = Sequential()
     #dim1 = len(x)
