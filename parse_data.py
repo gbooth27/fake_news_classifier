@@ -50,15 +50,16 @@ def parse(filename):
                 FN_dict = OrderedDict()
                 RN_dict = OrderedDict()
 
+
                 #most common words in Fake News
-                if label == 1:
+                if label == '1':
                     for word in text_data:
                         if word.lower() in FN_words:
-                            FN_words[word] += 1
+                            FN_words[word.lower()] += 1
                         else:
-                            FN_words[word] = 1
-                        sorted_FN_words = sorted(FN_words.items(), key=operator.itemgetter(1))
-                        list_FN_words = [i[0] for i in sorted_FN_words]
+                            FN_words[word.lower()] = 1
+                    sorted_FN_words = sorted(FN_words.items(), key=operator.itemgetter(1))
+                    list_FN_words = [i[0] for i in sorted_FN_words]
                     top_20_FN = list_FN_words[:20]
 
 
@@ -72,16 +73,17 @@ def parse(filename):
                 CM_FN_text /= len_text
 
 
-                #Most common words in Fake News
-                if label == 0:
+                #Most common words in Real News
+                if label == '0':
                     for word in text_data:
                         if word.lower() in RN_words:
-                            RN_words[word] += 1
+                            RN_words[word.lower()] += 1
                         else:
-                            RN_words[word] = 1
-                        sorted_RN_words = sorted(RN_words.items(), key=operator.itemgetter(1))
-                        list_RN_words =  [i[0] for i in sorted_RN_words]
+                            RN_words.update({word.lower():1})
+                    sorted_RN_words = sorted(RN_words.items(), key=operator.itemgetter(1))
+                    list_RN_words =  [i[0] for i in sorted_RN_words]
                     top_20_RN = list_RN_words[:20]
+
 
 
                 len_text = len(text_data) + 1
@@ -92,10 +94,6 @@ def parse(filename):
                         CM_RN_text += 1
                     RN_dict[word.lower()] = 1  # /len_text
                 CM_RN_text /= len_text
-
-
-
-
 
 
                 for title in title_data:
