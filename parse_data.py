@@ -6,6 +6,8 @@ csv.field_size_limit(sys.maxsize)
 import re
 import progressbar
 from collections import Counter
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.feature_extraction.text import TfidfTransformer
 
 N = 18000
 
@@ -17,6 +19,7 @@ def common_words(filename):
     """
     FN_words = {}
     RN_words = {}
+    corpus = []
     with open(filename, newline="") as infile:
         reader = csv.reader(infile, delimiter=',')
         bar = progressbar.ProgressBar()
@@ -27,6 +30,7 @@ def common_words(filename):
                 break
 
             if reader.line_num > 1:
+                corpus.append(row[3])
                 text_data = row[3].split(" ")
                 label = row[4]
                 # most common words in Fake News
@@ -49,7 +53,12 @@ def common_words(filename):
     sorted_FN_words = sorted(list(FN_words.items()), key=lambda x: x[1])
     top_20_FN = sorted_FN_words[:40]
 
-    return top_20_FN, top_20_RN
+    # get freq vectorizor
+    # NEW STUFF
+    vectorizer = CountVectorizer()
+    X = vectorizer.fit_transform(corpus)
+
+    return top_20_FN, top_20_RN, vectorizer
 
 
 def parse(filename):
@@ -74,7 +83,7 @@ def parse(filename):
                   "bush":0}
 
     FN_figures = OrderedDict(sorted(FN_figures.items(), key=lambda t: t[0]))
-    top_20_FN, top_20_RN = common_words(filename)
+    top_20_FN, top_20_RN, vectorizer = common_words(filename)
     top_FN = OrderedDict(top_20_FN)
     top_RN = OrderedDict(top_20_RN)
 
@@ -167,6 +176,20 @@ def parse(filename):
                 Fig_text /= len_text
 
                 # set up example
+                #####################################
+                # NEW SHIT
+                # http://scikit-learn.org/stable/modules/feature_extraction.html
+                # look there for deets
+                arr = vectorizer.transform([row[3]]).toarray()
+                transformer = TfidfTransformer(smooth_idf=False)
+                #tfidf = transformer.fit_transform(arr).toarray()
+                farr = arr.flatten()
+                #farr = tfidf.flatten()
+                larr = list(farr[:1000])
+                example.extend(larr)
+                #############################################
+
+
                 example.extend(text_dict.values())
                 example.extend( title_dict.values())
                 example.extend(RN_dict.values())

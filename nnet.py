@@ -75,7 +75,7 @@ def run_nnet(data):
     :param data: examples
     :return:
     """
-    x, y = gen_training_data(data, parse_data.N//2)
+    x, y = gen_training_data(data, parse_data.N//2 + parse_data.N//3)
 
     model = Sequential()
     #dim1 = len(x)
@@ -90,9 +90,9 @@ def run_nnet(data):
     model.add(Dense(1000, kernel_initializer='random_uniform', activation='relu'))
     #model.add(Dropout(0.1, noise_shape=None, seed=None))
     #model.add(Dense(1000, kernel_initializer='random_uniform', activation='relu'))
-    #model.add(Dropout(0.2, noise_shape=None, seed=None))
-    #model.add(Dense(1000, kernel_initializer='random_uniform', activation='relu'))
-    #model.add(Dropout(0.2, noise_shape=None, seed=None))
+    model.add(Dropout(0.2, noise_shape=None, seed=None))
+    model.add(Dense(1000, kernel_initializer='random_uniform', activation='relu'))
+    model.add(Dropout(0.2, noise_shape=None, seed=None))
     model.add(Dense(200, kernel_initializer='random_uniform', activation='relu'))
     #model.add(Dropout(0.2, noise_shape=None, seed=None))
     #model.add(Dense(1000, kernel_initializer='random_uniform', activation='relu'))
@@ -101,7 +101,7 @@ def run_nnet(data):
     sgd = optimizers.Adam()
     model.compile(loss='binary_crossentropy', optimizer=sgd)#, metrics=["mse"])
 
-    model.fit(x, y, epochs=20, batch_size=100, verbose=2, validation_split=0.2)
+    model.fit(x, y, epochs=30, batch_size=100, verbose=2, validation_split=0.2)
 
     return model
 
@@ -112,9 +112,9 @@ if __name__ == "__main__":
         #wr.writerows(data)
 
     model = run_nnet(data)
-    x, y = gen_training_data(data[parse_data.N//2:], len(data[parse_data.N//2:]))
+    x, y = gen_training_data(data[parse_data.N//2 + parse_data.N//3:], len(data[parse_data.N//2 + parse_data.N//3:]))
     print("Evaluating model...")
-    evaluation = model.evaluate(x=x, y=y, verbose=1, batch_size=300)
+    evaluation = model.evaluate(x=x, y=y, verbose=2, batch_size=300)
     print("Test Loss: " + str(evaluation))
     print("\nPredicting against test data....")
     predict(model, x, y)

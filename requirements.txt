@@ -2,3 +2,4 @@ keras
 numpy
 tensorflow
 progressbar2
+scikit-learn
