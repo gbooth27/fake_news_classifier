@@ -1,3 +1,4 @@
 keras
 numpy
 tensorflow
+progressbar2

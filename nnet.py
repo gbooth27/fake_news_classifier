@@ -11,6 +11,7 @@ import parse_data
 from keras import optimizers
 import os
 from keras import backend as K
+import csv
 
 def gen_training_data(data, examples):
     """
@@ -74,7 +75,7 @@ def run_nnet(data):
     :param data: examples
     :return:
     """
-    x, y = gen_training_data(data, 1000)
+    x, y = gen_training_data(data, parse_data.N//2)
 
     model = Sequential()
     #dim1 = len(x)
@@ -84,30 +85,34 @@ def run_nnet(data):
     model.add(Dense(dim2, input_dim=dim2, kernel_initializer='random_uniform', activation='relu'))
     model.add(Dense(200, kernel_initializer='random_uniform', activation='relu'))
     model.add(Dropout(0.2, noise_shape=None, seed=None))
-    model.add(Dense(400, kernel_initializer='random_uniform', activation='relu'))
-    model.add(Dropout(0.1, noise_shape=None, seed=None))
-    model.add(Dense(1000, kernel_initializer='random_uniform', activation='relu'))
-    model.add(Dropout(0.1, noise_shape=None, seed=None))
-    model.add(Dense(1000, kernel_initializer='random_uniform', activation='relu'))
-    model.add(Dropout(0.2, noise_shape=None, seed=None))
-    model.add(Dense(1000, kernel_initializer='random_uniform', activation='relu'))
-    model.add(Dropout(0.2, noise_shape=None, seed=None))
-    model.add(Dense(200, kernel_initializer='random_uniform', activation='relu'))
+    model.add(Dense(50, kernel_initializer='random_uniform', activation='relu'))
     model.add(Dropout(0.2, noise_shape=None, seed=None))
     model.add(Dense(1000, kernel_initializer='random_uniform', activation='relu'))
     #model.add(Dropout(0.1, noise_shape=None, seed=None))
-    model.add(Dense(1, kernel_initializer='random_uniform', activation="sigmoid"))
+    #model.add(Dense(1000, kernel_initializer='random_uniform', activation='relu'))
+    #model.add(Dropout(0.2, noise_shape=None, seed=None))
+    #model.add(Dense(1000, kernel_initializer='random_uniform', activation='relu'))
+    #model.add(Dropout(0.2, noise_shape=None, seed=None))
+    model.add(Dense(200, kernel_initializer='random_uniform', activation='relu'))
+    #model.add(Dropout(0.2, noise_shape=None, seed=None))
+    #model.add(Dense(1000, kernel_initializer='random_uniform', activation='relu'))
+    #model.add(Dropout(0.1, noise_shape=None, seed=None))
+    model.add(Dense(1, kernel_initializer='random_uniform', activation="relu"))
     sgd = optimizers.Adam()
     model.compile(loss='binary_crossentropy', optimizer=sgd)#, metrics=["mse"])
 
-    model.fit(x, y, epochs=50, batch_size=100, verbose=2, validation_split=0.2)
+    model.fit(x, y, epochs=20, batch_size=100, verbose=2, validation_split=0.2)
 
     return model
 
 if __name__ == "__main__":
     data = parse_data.parse("kaggle_data.csv")
+    #with open("data_gen.csv", 'wb' ) as myfile:
+       # wr = csv.writer(myfile, lineterminator='\n')
+        #wr.writerows(data)
+
     model = run_nnet(data)
-    x, y = gen_training_data(data[10000:], len(data[10000:]))
+    x, y = gen_training_data(data[parse_data.N//2:], len(data[parse_data.N//2:]))
     print("Evaluating model...")
     evaluation = model.evaluate(x=x, y=y, verbose=1, batch_size=300)
     print("Test Loss: " + str(evaluation))
