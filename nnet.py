@@ -21,15 +21,6 @@ def gen_training_data(data, examples):
     :param data:
     :return:
     """
-
-    author_dict = {}
-    """author = 1
-    for i in range(examples):
-        # map each author to number
-        if data[i][0] not in author_dict:
-            author_dict[data[i][0]] = author
-            author += 1
-    """
     # Number of examples
     m = examples
     # Number of features
@@ -98,13 +89,9 @@ def run_nnet(data):
     model.add(Dense(1000, kernel_initializer='random_uniform', activation='relu'))
     #model.add(Dropout(0.1, noise_shape=None, seed=None))
     #model.add(Dense(1000, kernel_initializer='random_uniform', activation='relu'))
-    #model.add(Dropout(0.1, noise_shape=None, seed=None))
-    #model.add(Dense(1000, kernel_initializer='random_uniform', activation='relu'))
-    #model.add(Dropout(0.1, noise_shape=None, seed=None))
     model.add(Dense(200, kernel_initializer='random_uniform', activation='relu'))
     #model.add(Dropout(0.2, noise_shape=None, seed=None))
     #model.add(Dense(1000, kernel_initializer='random_uniform', activation='relu'))
-    #model.add(Dropout(0.1, noise_shape=None, seed=None))
     model.add(Dense(1, kernel_initializer='random_uniform', activation="relu"))
     opt = optimizers.Adam()
     model.compile(loss='binary_crossentropy', optimizer=opt)#, metrics=["mse"])

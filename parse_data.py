@@ -41,27 +41,6 @@ def common_words(filename):
         for row in bar(reader):
             if reader.line_num > 1:
                 corpus.append(row[3])
-                """text_data = row[3].split(" ")
-                label = row[4]
-                # most common words in Fake News
-                if label == '1':
-                    for word in text_data:
-                        if word.lower() in FN_words:
-                            FN_words[word.lower()] += 1
-                        else:
-                            FN_words[word.lower()] = 1
-                # Most common words in Real News
-                else:
-                    for word in text_data:
-                        if word.lower() in RN_words:
-                            RN_words[word.lower()] += 1
-                        else:
-                            RN_words.update({word.lower(): 1})"""
-    # get the top twenty of each
-    """sorted_RN_words = sorted(list(RN_words.items()), key=lambda x: x[1])
-    top_20_RN = sorted_RN_words[:40]
-    sorted_FN_words = sorted(list(FN_words.items()), key=lambda x: x[1])
-    top_20_FN = sorted_FN_words[:40]"""
 
     # get freq vectorizor
     # NEW STUFF
@@ -113,8 +92,6 @@ def parse(filename):
     FN_figures = OrderedDict(sorted(FN_figures.items(), key=lambda t: t[0]))
     #top_20_FN, top_20_RN, vectorizer = common_words(filename)
     vectorizer = common_words(filename)
-    """top_FN = OrderedDict(top_20_FN)
-    top_RN = OrderedDict(top_20_RN)"""
 
     # get author data
     auth_dict = author_data(filename)
@@ -136,33 +113,6 @@ def parse(filename):
                 text_data = row[3].split(" ")
                 label = row[4]
                 # Parse the data from the title
-
-                """FN_dict = OrderedDict()
-                RN_dict = OrderedDict()"""
-
-
-
-                """len_text = len(text_data) + 1
-                CM_FN_text = 0
-                for word in text_data:
-                    # Find Language set
-                    if word.lower() in FN_dict:
-                        CM_FN_text += 1
-                        #FN_dict[word.lower()] = 1  # /len_text
-                CM_FN_text /= len_text
-
-
-
-                len_text = len(text_data) + 1
-                CM_RN_text = 0
-                for word in text_data:
-                    # Find Language set
-                    if word.lower() in RN_dict:
-                        CM_RN_text += 1
-                    #RN_dict[word.lower()] = 1  # /len_text
-                CM_RN_text /= len_text
-                """
-
                 for title in title_data:
                     Num_Caps = sum(1 for c in title if c.isupper())
                     Num_excalmation_points = title.count("!")
@@ -190,24 +140,6 @@ def parse(filename):
                             title_dict[word.lower()]= 1 #/title_len
                     # change to fraction of title that are key words
                     Fig_det /= len(title)+1
-
-
-                """len_text = len(text_data)+1
-                Fig_text = 0
-                for word in text_data:
-                    #Find Language set
-                    if word.lower() in FN_figures:
-                        Fig_text +=1
-                        text_dict[word.lower()] = 1000/len_text
-                    # check if common RN dict
-                    if word.lower() in RN_dict:
-                        RN_dict[word.lower()] = 1000/len_text
-
-                    # check if common FN dict
-                    if word.lower() in FN_dict:
-                        FN_dict[word.lower()] = 1000/len_text
-
-                Fig_text /= len_text"""
 
                 copy_auth_dict = OrderedDict()
                 # get copy ordered dictionaries of authors
