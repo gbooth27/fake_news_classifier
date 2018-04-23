@@ -96,10 +96,10 @@ def run_nnet(data):
     model.add(Dense(50, kernel_initializer='random_uniform', activation='relu'))
     model.add(Dropout(0.1, noise_shape=None, seed=None))
     model.add(Dense(1000, kernel_initializer='random_uniform', activation='relu'))
-    model.add(Dropout(0.1, noise_shape=None, seed=None))
-    model.add(Dense(1000, kernel_initializer='random_uniform', activation='relu'))
-    model.add(Dropout(0.1, noise_shape=None, seed=None))
-    model.add(Dense(1000, kernel_initializer='random_uniform', activation='relu'))
+    #model.add(Dropout(0.1, noise_shape=None, seed=None))
+    #model.add(Dense(1000, kernel_initializer='random_uniform', activation='relu'))
+    #model.add(Dropout(0.1, noise_shape=None, seed=None))
+    #model.add(Dense(1000, kernel_initializer='random_uniform', activation='relu'))
     #model.add(Dropout(0.1, noise_shape=None, seed=None))
     model.add(Dense(200, kernel_initializer='random_uniform', activation='relu'))
     #model.add(Dropout(0.2, noise_shape=None, seed=None))
@@ -118,8 +118,8 @@ def run_nnet(data):
                         steps_per_epoch=steps_per_epoch,
                         validation_steps=steps_per_epoch,
                         epochs=10,
-                        verbose=2)"""
-    model.fit(x, y, epochs=50, batch_size=2048, verbose=2, validation_split=0.2)
+                        verbose=2)#"""
+    model.fit(x, y, epochs=15, batch_size=128, verbose=2, validation_split=0.2)
 
     return model
 

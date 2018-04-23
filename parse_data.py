@@ -38,15 +38,10 @@ def common_words(filename):
     with open(filename, newline="", encoding="utf8") as infile:
         reader = csv.reader(infile, delimiter=',')
         bar = progressbar.ProgressBar()
-        i = 0
         for row in bar(reader):
-            i += 1
-            if i > N//2:
-                break
-
             if reader.line_num > 1:
                 corpus.append(row[3])
-                text_data = row[3].split(" ")
+                """text_data = row[3].split(" ")
                 label = row[4]
                 # most common words in Fake News
                 if label == '1':
@@ -61,19 +56,19 @@ def common_words(filename):
                         if word.lower() in RN_words:
                             RN_words[word.lower()] += 1
                         else:
-                            RN_words.update({word.lower(): 1})
+                            RN_words.update({word.lower(): 1})"""
     # get the top twenty of each
-    sorted_RN_words = sorted(list(RN_words.items()), key=lambda x: x[1])
+    """sorted_RN_words = sorted(list(RN_words.items()), key=lambda x: x[1])
     top_20_RN = sorted_RN_words[:40]
     sorted_FN_words = sorted(list(FN_words.items()), key=lambda x: x[1])
-    top_20_FN = sorted_FN_words[:40]
+    top_20_FN = sorted_FN_words[:40]"""
 
     # get freq vectorizor
     # NEW STUFF
-    vectorizer = CountVectorizer()
+    vectorizer = CountVectorizer(ngram_range=(1, 3), stop_words="english", max_features=2500)
     vectorizer.fit_transform(corpus)
 
-    return top_20_FN, top_20_RN, vectorizer
+    return  vectorizer
 
 
 def author_data(filename):
@@ -116,9 +111,10 @@ def parse(filename):
                   "bush":0}
 
     FN_figures = OrderedDict(sorted(FN_figures.items(), key=lambda t: t[0]))
-    top_20_FN, top_20_RN, vectorizer = common_words(filename)
-    top_FN = OrderedDict(top_20_FN)
-    top_RN = OrderedDict(top_20_RN)
+    #top_20_FN, top_20_RN, vectorizer = common_words(filename)
+    vectorizer = common_words(filename)
+    """top_FN = OrderedDict(top_20_FN)
+    top_RN = OrderedDict(top_20_RN)"""
 
     # get author data
     auth_dict = author_data(filename)
@@ -141,12 +137,12 @@ def parse(filename):
                 label = row[4]
                 # Parse the data from the title
 
-                FN_dict = OrderedDict()
-                RN_dict = OrderedDict()
+                """FN_dict = OrderedDict()
+                RN_dict = OrderedDict()"""
 
 
 
-                len_text = len(text_data) + 1
+                """len_text = len(text_data) + 1
                 CM_FN_text = 0
                 for word in text_data:
                     # Find Language set
@@ -165,7 +161,7 @@ def parse(filename):
                         CM_RN_text += 1
                     #RN_dict[word.lower()] = 1  # /len_text
                 CM_RN_text /= len_text
-
+                """
 
                 for title in title_data:
                     Num_Caps = sum(1 for c in title if c.isupper())
@@ -182,12 +178,12 @@ def parse(filename):
                         text_dict[item] = FN_figures[item]
                     title_len = len(title) + 1
 
-                    # get copy ordered dictionaries of common words
+                    """# get copy ordered dictionaries of common words
                     for key in top_RN.keys():
                         RN_dict[key] = 0
                     for key in top_FN.keys():
                         FN_dict[key] = 0
-
+                    """
                     for word in title:
                         if word.lower() in FN_figures:
                             Fig_det += 1
@@ -196,7 +192,7 @@ def parse(filename):
                     Fig_det /= len(title)+1
 
 
-                len_text = len(text_data)+1
+                """len_text = len(text_data)+1
                 Fig_text = 0
                 for word in text_data:
                     #Find Language set
@@ -211,7 +207,7 @@ def parse(filename):
                     if word.lower() in FN_dict:
                         FN_dict[word.lower()] = 1000/len_text
 
-                Fig_text /= len_text
+                Fig_text /= len_text"""
 
                 copy_auth_dict = OrderedDict()
                 # get copy ordered dictionaries of authors
@@ -230,21 +226,21 @@ def parse(filename):
                 #tfidf = transformer.fit_transform(arr).toarray()
                 farr = arr.flatten()
                 #farr = tfidf.flatten()
-                larr = list(farr[:100])
+                larr = list(farr)
                 example.extend(larr)
                 #############################################
 
 
-                example.extend(text_dict.values())
+                #example.extend(text_dict.values())
                 example.extend( title_dict.values())
-                example.extend(RN_dict.values())
-                example.extend(FN_dict.values())
+                #example.extend(RN_dict.values())
+                #example.extend(FN_dict.values())
                 example.extend(copy_auth_dict.values())
 
                 #example.append(title_len)
                 #example.append(len_text)
-                example.extend([Num_Caps, Num_excalmation_points, Num_Question_marks, Fig_det, Fig_text,
-                                CM_RN_text, CM_FN_text,  label])
+                example.extend([Num_Caps, Num_excalmation_points, Num_Question_marks, Fig_det, label])#Fig_text,
+                                #CM_RN_text, CM_FN_text,  label])
                 data.append(example)
     return data
 
