@@ -84,15 +84,15 @@ def run_nnet(data):
     # Tuning
     model.add(Dense(dim2, input_dim=dim2, kernel_initializer='random_uniform', activation='relu'))
     model.add(Dense(200, kernel_initializer='random_uniform', activation='relu'))
-    model.add(Dropout(0.2, noise_shape=None, seed=None))
+    model.add(Dropout(0.1, noise_shape=None, seed=None))
     model.add(Dense(50, kernel_initializer='random_uniform', activation='relu'))
-    model.add(Dropout(0.2, noise_shape=None, seed=None))
+    model.add(Dropout(0.1, noise_shape=None, seed=None))
     model.add(Dense(1000, kernel_initializer='random_uniform', activation='relu'))
     #model.add(Dropout(0.1, noise_shape=None, seed=None))
     #model.add(Dense(1000, kernel_initializer='random_uniform', activation='relu'))
-    model.add(Dropout(0.2, noise_shape=None, seed=None))
+    model.add(Dropout(0.1, noise_shape=None, seed=None))
     model.add(Dense(1000, kernel_initializer='random_uniform', activation='relu'))
-    model.add(Dropout(0.2, noise_shape=None, seed=None))
+    model.add(Dropout(0.1, noise_shape=None, seed=None))
     model.add(Dense(200, kernel_initializer='random_uniform', activation='relu'))
     #model.add(Dropout(0.2, noise_shape=None, seed=None))
     #model.add(Dense(1000, kernel_initializer='random_uniform', activation='relu'))
@@ -101,8 +101,9 @@ def run_nnet(data):
     opt = optimizers.Adam()
     model.compile(loss='binary_crossentropy', optimizer=opt)#, metrics=["mse"])
 
-    model.fit(x, y, epochs=10, batch_size=100, verbose=2, validation_split=0.2)
     print(model.summary())
+    model.fit(x, y, epochs=10, batch_size=100, verbose=2, validation_split=0.2)
+
     return model
 
 if __name__ == "__main__":

@@ -22,9 +22,9 @@ def common_words(filename):
     corpus = []
     with open(filename, newline="") as infile:
         reader = csv.reader(infile, delimiter=',')
-        #bar = progressbar.ProgressBar()
+        bar = progressbar.ProgressBar()
         i = 0
-        for row in reader:
+        for row in bar(reader):
             i += 1
             if i > N//2:
                 break
@@ -70,8 +70,8 @@ def author_data(filename):
     auth_dict = OrderedDict()
     with open(filename, newline="") as infile:
         reader = csv.reader(infile, delimiter=',')
-        #bar = progressbar.ProgressBar()
-        for row in reader:
+        bar = progressbar.ProgressBar()
+        for row in bar(reader):
             if reader.line_num > 1:
                 auth_data = row[2]
                 if auth_data not in auth_dict:
@@ -112,9 +112,9 @@ def parse(filename):
     with open(filename, newline='') as infile:
         reader = csv.reader(infile, delimiter=',')
         data = []
-        #bar = progressbar.ProgressBar()
+        bar = progressbar.ProgressBar()
         i = 0
-        for row in reader:
+        for row in bar(reader):
             i += 1
             if i> N:
                 break
