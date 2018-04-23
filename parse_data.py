@@ -2,12 +2,27 @@ import csv
 import sys
 import operator
 from collections import OrderedDict
-csv.field_size_limit(sys.maxsize)
 import re
 import progressbar
 from collections import Counter
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfTransformer
+
+
+maxInt = sys.maxsize
+decrement = True
+
+while decrement:
+    # decrease the maxInt value by factor 10
+    # as long as the OverflowError occurs.
+
+    decrement = False
+    try:
+        csv.field_size_limit(maxInt)
+    except OverflowError:
+        maxInt = int(maxInt/10)
+        decrement = True
+
 
 N = 18000
 
@@ -20,7 +35,7 @@ def common_words(filename):
     FN_words = {}
     RN_words = {}
     corpus = []
-    with open(filename, newline="") as infile:
+    with open(filename, newline="", encoding="utf8") as infile:
         reader = csv.reader(infile, delimiter=',')
         bar = progressbar.ProgressBar()
         i = 0
@@ -56,7 +71,7 @@ def common_words(filename):
     # get freq vectorizor
     # NEW STUFF
     vectorizer = CountVectorizer()
-    X = vectorizer.fit_transform(corpus)
+    vectorizer.fit_transform(corpus)
 
     return top_20_FN, top_20_RN, vectorizer
 
@@ -68,7 +83,7 @@ def author_data(filename):
     :return:
     """
     auth_dict = OrderedDict()
-    with open(filename, newline="") as infile:
+    with open(filename, newline="", encoding="utf8") as infile:
         reader = csv.reader(infile, delimiter=',')
         bar = progressbar.ProgressBar()
         for row in bar(reader):
@@ -109,7 +124,7 @@ def parse(filename):
     auth_dict = author_data(filename)
 
 
-    with open(filename, newline='') as infile:
+    with open(filename, newline='', encoding="utf8") as infile:
         reader = csv.reader(infile, delimiter=',')
         data = []
         bar = progressbar.ProgressBar()
@@ -215,7 +230,7 @@ def parse(filename):
                 #tfidf = transformer.fit_transform(arr).toarray()
                 farr = arr.flatten()
                 #farr = tfidf.flatten()
-                larr = list(farr[:10])
+                larr = list(farr[:100])
                 example.extend(larr)
                 #############################################
 

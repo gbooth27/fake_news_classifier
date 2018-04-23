@@ -12,6 +12,8 @@ from keras import optimizers
 import os
 from keras import backend as K
 import csv
+import generator
+import math
 
 def gen_training_data(data, examples):
     """
@@ -32,8 +34,8 @@ def gen_training_data(data, examples):
     m = examples
     # Number of features
     n = len(data[0])-1
-    x = np.zeros((m, n))
-    y = np.zeros((m, 1))
+    x = np.zeros((m, n), dtype=np.float32)
+    y = np.zeros((m, 1), dtype=np.float32)
     # get the data as numpy vectors
     for i in range(examples):
         for j in range(n):
@@ -65,7 +67,9 @@ def predict(model, x, y):
         else:
             wrong += 1
     print("###############################")
-    print("Number Correct: {}\nNumber Incorrect: {}\nPercent error: {}".format(right, wrong, 100*(wrong/len(predict))))
+    print("Number Correct: {}\nNumber Incorrect: {}\nPercent accuracy: {}".format(right,
+                                                                                  wrong,
+                                                                                  100*(1-(wrong/len(predict)))))
     print("###############################")
 
 
@@ -76,6 +80,10 @@ def run_nnet(data):
     :return:
     """
     x, y = gen_training_data(data, parse_data.N//2 + parse_data.N//3)
+    val_split = 0.2
+    val_index = math.ceil(len(x)*(1-val_split))
+    training_gen = generator.generator(x[0:val_index],y[0:val_index])
+    val_gen = generator.generator(x[val_index:], y[val_index:])
 
     model = Sequential()
     #dim1 = len(x)
@@ -88,11 +96,11 @@ def run_nnet(data):
     model.add(Dense(50, kernel_initializer='random_uniform', activation='relu'))
     model.add(Dropout(0.1, noise_shape=None, seed=None))
     model.add(Dense(1000, kernel_initializer='random_uniform', activation='relu'))
-    #model.add(Dropout(0.1, noise_shape=None, seed=None))
-    #model.add(Dense(1000, kernel_initializer='random_uniform', activation='relu'))
     model.add(Dropout(0.1, noise_shape=None, seed=None))
     model.add(Dense(1000, kernel_initializer='random_uniform', activation='relu'))
     model.add(Dropout(0.1, noise_shape=None, seed=None))
+    model.add(Dense(1000, kernel_initializer='random_uniform', activation='relu'))
+    #model.add(Dropout(0.1, noise_shape=None, seed=None))
     model.add(Dense(200, kernel_initializer='random_uniform', activation='relu'))
     #model.add(Dropout(0.2, noise_shape=None, seed=None))
     #model.add(Dense(1000, kernel_initializer='random_uniform', activation='relu'))
@@ -101,8 +109,17 @@ def run_nnet(data):
     opt = optimizers.Adam()
     model.compile(loss='binary_crossentropy', optimizer=opt)#, metrics=["mse"])
 
+
+
     print(model.summary())
-    model.fit(x, y, epochs=10, batch_size=100, verbose=2, validation_split=0.2)
+    steps_per_epoch = 400
+    """model.fit_generator(generator=training_gen.gen_mem(val_index//steps_per_epoch),
+                        validation_data=val_gen.gen_mem((len(x)-val_index)//steps_per_epoch),
+                        steps_per_epoch=steps_per_epoch,
+                        validation_steps=steps_per_epoch,
+                        epochs=10,
+                        verbose=2)"""
+    model.fit(x, y, epochs=50, batch_size=2048, verbose=2, validation_split=0.2)
 
     return model
 

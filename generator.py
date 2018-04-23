@@ -6,8 +6,8 @@ import parse_data
 class generator:
 
     def __init__(self, x, y):
-        x = x
-        y = y
+        self.x = x
+        self.y = y
 
 
     def gen_mem(self, batch_size):
