@@ -44,7 +44,7 @@ def common_words(filename):
 
     # get freq vectorizor
     # NEW STUFF
-    vectorizer = CountVectorizer(ngram_range=(1, 3), stop_words="english", max_features=2500)
+    vectorizer = CountVectorizer(ngram_range=(1, 3), stop_words="english", max_features=2750)
     vectorizer.fit_transform(corpus)
 
     return  vectorizer

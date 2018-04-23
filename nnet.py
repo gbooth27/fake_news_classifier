@@ -100,11 +100,11 @@ def run_nnet(data):
 
     print(model.summary())
     steps_per_epoch = 400
-    """model.fit_generator(generator=training_gen.gen_mem(val_index//steps_per_epoch),
-                        validation_data=val_gen.gen_mem((len(x)-val_index)//steps_per_epoch),
+    """model.fit_generator(generator=training_gen.gen_mem(64),
+                        validation_data=val_gen.gen_mem(64),
                         steps_per_epoch=steps_per_epoch,
                         validation_steps=steps_per_epoch,
-                        epochs=10,
+                        epochs=5,
                         verbose=2)#"""
     model.fit(x, y, epochs=15, batch_size=256, verbose=2, validation_split=0.2)
 
