@@ -98,11 +98,11 @@ def run_nnet(data):
     #model.add(Dense(1000, kernel_initializer='random_uniform', activation='relu'))
     #model.add(Dropout(0.1, noise_shape=None, seed=None))
     model.add(Dense(1, kernel_initializer='random_uniform', activation="relu"))
-    sgd = optimizers.Adam()
-    model.compile(loss='binary_crossentropy', optimizer=sgd)#, metrics=["mse"])
+    opt = optimizers.Adam()
+    model.compile(loss='binary_crossentropy', optimizer=opt)#, metrics=["mse"])
 
-    model.fit(x, y, epochs=30, batch_size=100, verbose=2, validation_split=0.2)
-
+    model.fit(x, y, epochs=10, batch_size=100, verbose=2, validation_split=0.2)
+    print(model.summary())
     return model
 
 if __name__ == "__main__":

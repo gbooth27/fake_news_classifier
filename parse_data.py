@@ -22,9 +22,9 @@ def common_words(filename):
     corpus = []
     with open(filename, newline="") as infile:
         reader = csv.reader(infile, delimiter=',')
-        bar = progressbar.ProgressBar()
+        #bar = progressbar.ProgressBar()
         i = 0
-        for row in bar(reader):
+        for row in reader:
             i += 1
             if i > N//2:
                 break
@@ -61,6 +61,24 @@ def common_words(filename):
     return top_20_FN, top_20_RN, vectorizer
 
 
+def author_data(filename):
+    """
+    get the total
+    :param filename:
+    :return:
+    """
+    auth_dict = OrderedDict()
+    with open(filename, newline="") as infile:
+        reader = csv.reader(infile, delimiter=',')
+        #bar = progressbar.ProgressBar()
+        for row in reader:
+            if reader.line_num > 1:
+                auth_data = row[2]
+                if auth_data not in auth_dict:
+                    auth_dict[auth_data] = 0
+    return auth_dict
+
+
 def parse(filename):
     """
     parses data from csv
@@ -87,26 +105,31 @@ def parse(filename):
     top_FN = OrderedDict(top_20_FN)
     top_RN = OrderedDict(top_20_RN)
 
+    # get author data
+    auth_dict = author_data(filename)
+
 
     with open(filename, newline='') as infile:
         reader = csv.reader(infile, delimiter=',')
         data = []
-        bar = progressbar.ProgressBar()
+        #bar = progressbar.ProgressBar()
         i = 0
-        for row in bar(reader):
+        for row in reader:
             i += 1
             if i> N:
                 break
             example = []
             if reader.line_num>1:
                 title_data = row[1].split(" ")
-                author_data = row[2]
+                author = row[2]
                 text_data = row[3].split(" ")
                 label = row[4]
                 # Parse the data from the title
 
                 FN_dict = OrderedDict()
                 RN_dict = OrderedDict()
+
+
 
                 len_text = len(text_data) + 1
                 CM_FN_text = 0
@@ -175,6 +198,13 @@ def parse(filename):
 
                 Fig_text /= len_text
 
+                copy_auth_dict = OrderedDict()
+                # get copy ordered dictionaries of authors
+                for key in auth_dict.keys():
+                    copy_auth_dict[key] = 0
+                copy_auth_dict[author] = 1
+
+
                 # set up example
                 #####################################
                 # NEW SHIT
@@ -185,7 +215,7 @@ def parse(filename):
                 #tfidf = transformer.fit_transform(arr).toarray()
                 farr = arr.flatten()
                 #farr = tfidf.flatten()
-                larr = list(farr[:1000])
+                larr = list(farr[:10])
                 example.extend(larr)
                 #############################################
 
@@ -194,6 +224,7 @@ def parse(filename):
                 example.extend( title_dict.values())
                 example.extend(RN_dict.values())
                 example.extend(FN_dict.values())
+                example.extend(copy_auth_dict.values())
 
                 #example.append(title_len)
                 #example.append(len_text)
