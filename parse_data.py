@@ -6,7 +6,7 @@ import re
 import progressbar
 from collections import Counter
 from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.feature_extraction.text import TfidfTransformer
+
 
 
 maxInt = sys.maxsize
@@ -24,7 +24,7 @@ while decrement:
         decrement = True
 
 
-N = 18000
+N = 20800
 
 def common_words(filename):
     """
@@ -44,7 +44,7 @@ def common_words(filename):
 
     # get freq vectorizor
     # NEW STUFF
-    vectorizer = CountVectorizer(ngram_range=(1, 3), stop_words="english", max_features=2750)
+    vectorizer = CountVectorizer(ngram_range=(1, 5), stop_words="english", max_features=6000)
     vectorizer.fit_transform(corpus)
 
     return  vectorizer
@@ -68,17 +68,12 @@ def author_data(filename):
     return auth_dict
 
 
-def parse(filename):
+def parse(filename, tesfile, only_text):
     """
     parses data from csv
     :param filename:
     :return:
     """
-
-    #Ideas
-    #List of fake news topics
-    #list of aggressive language commonly used in fake news
-    #Grammar
 
     # Set containing key words
     FN_figures = {"russia":0, "russian":0, "wikileaks":0, "comey":0, "donald":0, "trump":0, "melania":0, "jared":0, "kushner":0,
@@ -90,7 +85,6 @@ def parse(filename):
                   "bush":0}
 
     FN_figures = OrderedDict(sorted(FN_figures.items(), key=lambda t: t[0]))
-    #top_20_FN, top_20_RN, vectorizer = common_words(filename)
     vectorizer = common_words(filename)
 
     # get author data
@@ -128,12 +122,7 @@ def parse(filename):
                         text_dict[item] = FN_figures[item]
                     title_len = len(title) + 1
 
-                    """# get copy ordered dictionaries of common words
-                    for key in top_RN.keys():
-                        RN_dict[key] = 0
-                    for key in top_FN.keys():
-                        FN_dict[key] = 0
-                    """
+                    # Get TITLE features
                     for word in title:
                         if word.lower() in FN_figures:
                             Fig_det += 1
@@ -150,33 +139,98 @@ def parse(filename):
 
                 # set up example
                 #####################################
-                # NEW SHIT
+                # NEW VECTORIZOR STUFF
                 # http://scikit-learn.org/stable/modules/feature_extraction.html
                 # look there for deets
                 arr = vectorizer.transform([row[3]]).toarray()
-                transformer = TfidfTransformer(smooth_idf=False)
-                #tfidf = transformer.fit_transform(arr).toarray()
                 farr = arr.flatten()
-                #farr = tfidf.flatten()
                 larr = list(farr)
                 example.extend(larr)
                 #############################################
 
+                if not only_text:
+                    #example.extend(text_dict.values())
+                    example.extend( title_dict.values())
+                    example.extend(copy_auth_dict.values())
 
-                #example.extend(text_dict.values())
-                example.extend( title_dict.values())
-                #example.extend(RN_dict.values())
-                #example.extend(FN_dict.values())
-                example.extend(copy_auth_dict.values())
+                    example.append(title_len)
+                    #example.append(len_text)
+                    example.extend([Num_Caps, Num_excalmation_points, Num_Question_marks, Fig_det])
 
-                #example.append(title_len)
-                #example.append(len_text)
-                example.extend([Num_Caps, Num_excalmation_points, Num_Question_marks, Fig_det, label])#Fig_text,
-                                #CM_RN_text, CM_FN_text,  label])
+                example.append(label)
                 data.append(example)
-    return data
+
+    ########################################
+    # Parsing of kaggle unlabeled text file
+    ######################################
+    with open(tesfile, newline='', encoding="utf8") as infile:
+        reader = csv.reader(infile, delimiter=',')
+        data2 = []
+        bar = progressbar.ProgressBar()
+        i = 0
+        for row in bar(reader):
+            i += 1
+            #if i > N:
+                #break
+            example = []
+            if reader.line_num > 1:
+                title_data = row[1].split(" ")
+                author = row[2]
+                text_data = row[3].split(" ")
+                # Parse the data from the title
+                for title in title_data:
+                    Num_Caps = sum(1 for c in title if c.isupper())
+                    Num_excalmation_points = title.count("!")
+                    Num_Question_marks = title.count("?")
+                    Fig_det = 0
+
+                    # get binary representations of words as ordered dict
+                    title_dict = OrderedDict()
+                    text_dict = OrderedDict()
+                    # GET ORDERED DICT OF ALL OF THE MANUALLY GENERATED WORDS
+                    for item in FN_figures.keys():
+                        title_dict[item] = FN_figures[item]
+                        text_dict[item] = FN_figures[item]
+                    title_len = len(title) + 1
+
+                    for word in title:
+                        if word.lower() in FN_figures:
+                            Fig_det += 1
+                            title_dict[word.lower()] = 1  # /title_len
+                    # change to fraction of title that are key words
+                    Fig_det /= len(title) + 1
+
+                copy_auth_dict = OrderedDict()
+                # get copy ordered dictionaries of authors
+                for key in auth_dict.keys():
+                    copy_auth_dict[key] = 0
+                # AUTHORS THAT DONT EXIST
+                if author in copy_auth_dict:
+                    copy_auth_dict[author] = 1
+
+                # set up example
+                #####################################
+                # NEW VECTORIZER
+                # http://scikit-learn.org/stable/modules/feature_extraction.html
+                # look there for deets
+                arr = vectorizer.transform([row[3]]).toarray()
+                farr = arr.flatten()
+                larr = list(farr)
+                example.extend(larr)
+                #############################################
+
+                if not only_text:
+                    # example.extend(text_dict.values())
+                    example.extend(title_dict.values())
+                    example.extend(copy_auth_dict.values())
+
+                    example.append(title_len)
+                    #example.append(len_text)
+                    example.extend([Num_Caps, Num_excalmation_points, Num_Question_marks, Fig_det])
+                data2.append(example)
+    return data, data2
 
 
 if __name__ == "__main__":
 
-    parse("kaggle_data.csv")
+    parse("kaggle_data.csv", "test.csv", False)

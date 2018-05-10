@@ -5,3 +5,8 @@ out
 gen
 venv
 data_gen.csv
+test.csv
+predictions.csv
+predictions1.csv
+models
+models/*

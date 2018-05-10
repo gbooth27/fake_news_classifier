@@ -1,25 +1,20 @@
-
 from keras.models import Sequential
 from keras.layers import Dense
 from keras.layers import Dropout
-from keras.layers import LSTM
 import numpy as np
 import argparse
 from keras.models import load_model
 import parse_data
-#from matplotlib import pyplot as plt
 from keras import optimizers
-import os
-from keras import backend as K
-import csv
-import generator
-import math
+import datetime
+
 
 def gen_training_data(data, examples):
     """
     formats data correctly
-    :param data:
-    :return:
+    :param data: training data
+    :param examples: number of examples to use
+    :return: correctly formatted data
     """
     # Number of examples
     m = examples
@@ -35,13 +30,33 @@ def gen_training_data(data, examples):
 
     return x, y
 
+
+def gen_training_data2(data):
+    """
+    formats data correctly, for unlabeled examples
+    :param data: unlabeled training data
+    :return: correctly formatted data
+    """
+    # Number of examples
+    m = len(data)
+    # Number of features
+    n = len(data[0])
+    x = np.zeros((m, n), dtype=np.float32)
+    #y = np.zeros((m, 1), dtype=np.float32)
+    # get the data as numpy vectors
+    for i in range(m):
+        for j in range(n):
+            x[i][j] = data[i][j]
+
+    return x
+
+
 def predict(model, x, y):
     """
     predicts for x and calculates accuracy
-    :param model:
-    :param x:
-    :param y:
-    :return:
+    :param model: model to predict against
+    :param x: feature vectors
+    :param y: labels
     """
     predict = model.predict(x=x)
     right = 0
@@ -66,60 +81,64 @@ def predict(model, x, y):
 
 def run_nnet(data):
     """
-    builds and runs the network
+    builds and trains the network
     :param data: examples
-    :return:
+    :return: trained model
     """
-    x, y = gen_training_data(data, parse_data.N//2 + parse_data.N//3)
-    val_split = 0.2
-    val_index = math.ceil(len(x)*(1-val_split))
-    training_gen = generator.generator(x[0:val_index],y[0:val_index])
-    val_gen = generator.generator(x[val_index:], y[val_index:])
+    #x, y = gen_training_data(data, parse_data.N//2 + parse_data.N//3)
+    x, y = gen_training_data(data, parse_data.N-1)
+
+    # THIS CODE WAS OUR ATTEMPT TO GET AROUND MEM REQS OF GPU, NOT ANY BETTER THAN NORMAL SADLY
+    #val_split = 0.2
+    #val_index = math.ceil(len(x)*(1-val_split))
+    #training_gen = generator.generator(x[0:val_index],y[0:val_index])
+    #val_gen = generator.generator(x[val_index:], y[val_index:])
 
     model = Sequential()
     #dim1 = len(x)
     dim2 = len(x[0])
-    # Add the layers.
-    # Tuning
+    # Add the layers, Including dropout.
     model.add(Dense(dim2, input_dim=dim2, kernel_initializer='random_uniform', activation='relu'))
     model.add(Dense(200, kernel_initializer='random_uniform', activation='relu'))
     model.add(Dropout(0.1, noise_shape=None, seed=None))
     model.add(Dense(256, kernel_initializer='random_uniform', activation='relu'))
     model.add(Dropout(0.1, noise_shape=None, seed=None))
     model.add(Dense(1000, kernel_initializer='random_uniform', activation='relu'))
-    #model.add(Dropout(0.1, noise_shape=None, seed=None))
-    #model.add(Dense(1000, kernel_initializer='random_uniform', activation='relu'))
     model.add(Dense(200, kernel_initializer='random_uniform', activation='relu'))
-    #model.add(Dropout(0.2, noise_shape=None, seed=None))
-    #model.add(Dense(1000, kernel_initializer='random_uniform', activation='relu'))
     model.add(Dense(1, kernel_initializer='random_uniform', activation="relu"))
+    # Set the optimizer
     opt = optimizers.Adam()
     model.compile(loss='binary_crossentropy', optimizer=opt)#, metrics=["mse"])
-
-
-
+    # Print out the summary of the model
     print(model.summary())
-    steps_per_epoch = 400
-    """model.fit_generator(generator=training_gen.gen_mem(64),
-                        validation_data=val_gen.gen_mem(64),
-                        steps_per_epoch=steps_per_epoch,
-                        validation_steps=steps_per_epoch,
-                        epochs=5,
-                        verbose=2)#"""
+    # Fit model, w/ validation split
     model.fit(x, y, epochs=15, batch_size=256, verbose=2, validation_split=0.2)
 
     return model
 
 if __name__ == "__main__":
-    data = parse_data.parse("kaggle_data.csv")
-    #with open("data_gen.csv", 'wb' ) as myfile:
-       # wr = csv.writer(myfile, lineterminator='\n')
-        #wr.writerows(data)
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--text_only', "-t", dest='text_only', action='store_false',
+                        help="Use to generate features using Only text data")
+    args = parser.parse_args()
 
+
+    data, data2  = parse_data.parse("kaggle_data.csv", "test.csv", args.text_only)
+
+    # Train the model
     model = run_nnet(data)
-    x, y = gen_training_data(data[parse_data.N//2 + parse_data.N//3:], len(data[parse_data.N//2 + parse_data.N//3:]))
-    print("Evaluating model...")
-    evaluation = model.evaluate(x=x, y=y, verbose=2, batch_size=300)
-    print("Test Loss: " + str(evaluation))
-    print("\nPredicting against test data....")
-    predict(model, x, y)
+    # Save the trained model
+    model.save("models/model_" + datetime.datetime.now().strftime("%Y-%m-%d_%H_%M_%S") + ".h5")
+
+    print("\nPredicting against test FINAL data....")
+    x = gen_training_data2(data2)
+    predictions = model.predict(x=x)
+    for i in range(len(predictions)):
+        if predictions[i] > 0.5:
+            predictions[i] = 1
+        else:
+            predictions[i] = 0
+
+    np.savetxt("predictions.csv", predictions, delimiter=",", fmt='%1i',)
+
+
