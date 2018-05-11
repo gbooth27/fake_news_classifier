@@ -118,12 +118,14 @@ def run_nnet(data):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
+    parser.add_argument('labeled_data', help="labeled data csv")
+    parser.add_argument('unlabeled_data', help="unlabeled data csv")
     parser.add_argument('--text_only', "-t", dest='text_only', action='store_false',
                         help="Use to generate features using Only text data")
     args = parser.parse_args()
 
 
-    data, data2  = parse_data.parse("kaggle_data.csv", "test.csv", args.text_only)
+    data, data2  = parse_data.parse(args.labeled_data, args.unlabeled_data, args.text_only)
 
     # Train the model
     model = run_nnet(data)
